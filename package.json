@@ -1,6 +1,6 @@
 {
   "name": "hapi-auth-auth0-lock-webapp",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Hapi plugin providing an Auth0 Lock scheme for Regular Webapps",
   "author": "Blaine Bublitz <blaine@iceddev.com> (http://iceddev.com)",
   "contributors": [],
