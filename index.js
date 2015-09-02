@@ -4,6 +4,7 @@ var joi = require('joi');
 var jwt = require('jsonwebtoken');
 var boom = require('boom');
 var nodefn = require('when/node');
+var assign = require('origami').assign;
 var rest = require('rest');
 var mime = require('rest/interceptor/mime');
 var template = require('rest/interceptor/template');
@@ -14,7 +15,9 @@ var optionsSchema = joi.object().keys({
   domain: joi.string().hostname().required(),
   clientId: joi.string().token().required(),
   clientSecret: joi.string().token().required(),
-  redirectUri: joi.string().uri().required()
+  redirectUri: joi.string().uri().required(),
+  // TODO: can this be restricted?
+  publicKey: joi.any()
 }).options({ abortEarly: false });
 
 function auth0LockWebappScheme(server, options){
@@ -31,10 +34,11 @@ function auth0LockWebappScheme(server, options){
       method: 'POST'
     });
 
-  var secret = new Buffer(options.clientSecret, 'base64');
+  var secret = options.publicKey ? options.publicKey : new Buffer(options.clientSecret, 'base64');
 
   function decode(result){
-    return nodefn.call(jwt.verify, result.id_token, secret);
+    var token = result.id_token;
+    return nodefn.call(jwt.verify, token, secret).fold(assign, { token: token });
   }
 
   return {
