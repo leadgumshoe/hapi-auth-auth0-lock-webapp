@@ -14,11 +14,13 @@ var defaultRequest = require('rest/interceptor/defaultRequest');
 var optionsSchema = joi.object().keys({
   domain: joi.string().hostname().required(),
   clientId: joi.string().token().required(),
-  clientSecret: joi.string().token().required(),
+  clientSecret: joi.string().required(),
   redirectUri: joi.string().uri().required(),
   // TODO: can this be restricted?
   publicKey: joi.any()
-}).options({ abortEarly: false });
+}).rename('clientID', 'clientId', { ignoreUndefined: true })
+  .rename('callbackURL', 'redirectUri', { ignoreUndefined: true })
+  .options({ abortEarly: false })
 
 function auth0LockWebappScheme(server, options){
   options = options || {};
