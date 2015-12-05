@@ -1,5 +1,7 @@
 'use strict';
 
+var assert = require('assert');
+
 var joi = require('joi');
 var jwt = require('jsonwebtoken');
 var boom = require('boom');
@@ -20,12 +22,16 @@ var optionsSchema = joi.object().keys({
   publicKey: joi.any()
 }).rename('clientID', 'clientId', { ignoreUndefined: true })
   .rename('callbackURL', 'redirectUri', { ignoreUndefined: true })
-  .options({ abortEarly: false })
+  .options({ abortEarly: false });
 
 function auth0LockWebappScheme(server, options){
   options = options || {};
 
-  joi.assert(options, optionsSchema);
+  var result = joi.validate(options, optionsSchema);
+
+  assert(!result.error, result.error && result.error.message);
+
+  options = result.value; // validate & renamed properties object
 
   var client = rest
     .wrap(mime, { mime: 'application/x-www-form-urlencoded' })
